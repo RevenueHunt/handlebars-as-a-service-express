@@ -21,11 +21,11 @@ app.use(bodyParser.text({ type: 'application/json' }));
 const port = process.env.PORT || 3003
 
 app.post('/', (req, res) => {
+  let t0 = Date.now()
   const raw_body = req.body
   const body =  JSON.parse(raw_body)
   const hmac = req.headers['x-hmac-sha256']
-  var rendered = ''
-  var error = ''
+  var output = {}
 
   if(!hmac) {
     console.log('missing hmac')
@@ -40,23 +40,23 @@ app.post('/', (req, res) => {
   }
 
   const data = body.data
-  console.log(data.quiz_id)
   const template = body.template
 
   try {
     const h_template = Handlebars.compile(template)
-    rendered = h_template(data)
-
-    res.send({
-      rendered: rendered
-    })
+    output = {
+      rendered: h_template(data)
+    }
   } catch (e) {
+    console.log(e.toString())
     error = e.toString().replace(/\n/gi, '<br>')
-
-    res.send({
+    output = {
       error: error
-    })
+    }
   }
+  console.log(`${data.quiz_id} - [${Date.now() - t0} ms]`)
+
+  res.send(output)
 })
 
 app.listen(port, () => {
