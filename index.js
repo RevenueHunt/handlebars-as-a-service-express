@@ -14,13 +14,15 @@ var helpers = require('handlebars-helpers')({
 });
 
 const app = express()
-// Make sure to parse the body as json
-app.use(bodyParser.json());
+// Make sure to parse the body as text before it gets parsed to JSON
+// as it needs to be in that format for the hmac to work correctly
+app.use(bodyParser.text({ type: 'application/json' }));
 
 const port = process.env.PORT || 3003
 
 app.post('/', (req, res) => {
-  const body = req.body
+  const raw_body = req.body
+  const body =  JSON.parse(raw_body)
   const hmac = req.headers['x-hmac-sha256']
   var rendered = ''
   var error = ''
@@ -31,39 +33,40 @@ app.post('/', (req, res) => {
     return
   }
 
-  if(!authenticate(body, hmac)) {
+  if(!authenticate(raw_body, hmac)) {
     console.log('wrong hmac')
     res.status(401).json('wrong hmac')
     return
   }
 
   const data = body.data
-
   console.log(data.quiz_id)
   const template = body.template
 
   try {
     const h_template = Handlebars.compile(template)
-    var rendered = h_template(data)
+    rendered = h_template(data)
+
+    res.send({
+      rendered: rendered
+    })
   } catch (e) {
     error = e.toString().replace(/\n/gi, '<br>')
-    console.log(error)
-  }
 
-  res.send({
-    rendered: rendered,
-    error: error
-  })
+    res.send({
+      error: error
+    })
+  }
 })
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
 
-function authenticate(body, hmac) {
+function authenticate(raw_body, hmac) {
   const secret = process.env.SECRET
 
-  calculated_hmac = Base64.stringify(hmacSHA256(JSON.stringify(body), secret))
+  calculated_hmac = Base64.stringify(hmacSHA256(raw_body, secret))
 
   return calculated_hmac === hmac
 }
