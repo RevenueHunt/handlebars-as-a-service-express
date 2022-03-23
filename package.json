@@ -1,0 +1,23 @@
+{
+  "name": "handlebars-as-a-service",
+  "version": "1.0.0",
+  "description": "Render handlebars on demand",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "handlebars",
+    "express"
+  ],
+  "author": "jfanals",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.2",
+    "crypto-js": "^4.1.1",
+    "dotenv": "^16.0.0",
+    "express": "^4.17.3",
+    "handlebars": "^4.7.7",
+    "handlebars-helpers": "^0.10.0"
+  }
+}
