@@ -16,7 +16,8 @@ var helpers = require('handlebars-helpers')({
 const app = express()
 // Make sure to parse the body as text before it gets parsed to JSON
 // as it needs to be in that format for the hmac to work correctly
-app.use(bodyParser.text({ type: 'application/json' }));
+// Increased default limit, to make sure we can handle large payloads
+app.use(bodyParser.text({ type: 'application/json', limit: '50mb' }));
 
 const port = process.env.PORT || 3003
 
