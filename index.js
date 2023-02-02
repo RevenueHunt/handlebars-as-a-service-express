@@ -41,6 +41,7 @@ app.post('/', (req, res) => {
   }
 
   const data = body.data
+  const response_id = body.response_id
   const template = body.template
 
   try {
@@ -55,7 +56,7 @@ app.post('/', (req, res) => {
       error: error
     }
   }
-  console.log(`${data.quiz_id} - [${Date.now() - t0} ms]`)
+  console.log(`${data.quiz_id} - ${response_id} - [${Date.now() - t0} ms]`)
 
   res.send(output)
 })
